@@ -1,6 +1,6 @@
-# Week 2 Review: National Park Campsite (Part 2)
+# Week 6 Review: National Park Campsite 
 
-In this exercise, you'll continue working with the National Park Campsite Reservation database. You'll now create DAO methods and integration tests.
+In this exercise, you'll be working with the National Park Campsite Reservation database. You'll create DAO methods and integration tests.
 
 ## Step One: Getting started
 
@@ -32,7 +32,7 @@ Verify that the connection strings in `appsettings.json` and `BaseDaoTests` are 
 
 ### Database schema
 
-To refresh your memory, here's the database schema:
+Here's the database schema:
 
 #### Parks table
 
@@ -132,6 +132,8 @@ A reservation requires a site ID, name to reserve under, a start date, and an en
 
 The user receives a confirmation ID (which is the new `reservation_id` from the database) once they submit their reservation.
 
+This method does not have to determine whether the space being reserved is already reserved by another camper.
+
 | Class             | Method                                                                         | Test                                            |
 |-------------------|--------------------------------------------------------------------------------|-------------------------------------------------|
 | ReservationSqlDao | CreateReservation(int siteId, string name, DateTime fromDate, DateTime toDate) | CreateReservation_Should_ReturnNewReservationId |
@@ -144,7 +146,7 @@ A reservation includes a reservation ID, site ID, name, start date, end date, an
 
 Find the correct classes where you'll need to write this method and test. The test data returns two reservations for the test `ParkId`.
 
-### Identify currently available sites in a given park
+### Bonus: Identify currently available sites in a given park
 
 The application needs the ability to search for currently available sites in a given park for a customer who didn't make a reservation.
 
