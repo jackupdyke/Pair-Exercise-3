@@ -34,6 +34,41 @@ namespace CampgroundReservations.DAO
             return reservationId;
         }
 
+        public List<Reservation> GetUpcomingReservation(int parkId)
+        {
+
+            List<Reservation> upcomingReservation = new List<Reservation>();
+            DateTime dateTime = DateTime.Now.AddDays(30);
+            DateTime today = DateTime.Now;
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("SELECT * FROM reservation r " +
+                    "JOIN site s ON r.site_id = s.site_id " +
+                    "JOIN campground c ON s.campground_id = c.campground_id " +
+                    "WHERE park_id = @park_id AND from_date >= @today AND from_date <= @DateTime;", conn);
+                cmd.Parameters.AddWithValue("@park_id", parkId);
+                cmd.Parameters.AddWithValue("@DateTime", dateTime);
+                cmd.Parameters.AddWithValue("@today", today);
+
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    Reservation reservation = GetReservationFromReader(reader);
+                    upcomingReservation.Add(reservation);
+
+                }
+            }
+
+                return upcomingReservation;
+        }
+
+        
+            
+
+
         private Reservation GetReservationFromReader(SqlDataReader reader)
         {
             Reservation reservation = new Reservation();

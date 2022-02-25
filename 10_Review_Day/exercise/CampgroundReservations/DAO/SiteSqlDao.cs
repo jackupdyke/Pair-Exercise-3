@@ -21,7 +21,7 @@ namespace CampgroundReservations.DAO
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
-                SqlCommand cmd = new SqlCommand("SELECT site_id, site_number, max_occupancy, accessible, max_rv_length, utilities " +
+                SqlCommand cmd = new SqlCommand("SELECT * " +
                     "FROM site s JOIN campground c ON s.campground_id = c.campground_id " +
                     "WHERE max_rv_length > 0 AND park_id = @park_id;", conn);
                 cmd.Parameters.AddWithValue("@park_id", parkId);
@@ -36,7 +36,40 @@ namespace CampgroundReservations.DAO
             }
             return sites;
         }
+        public List<Site> AvailableSites(int parkId)
+        {
 
+            List<Site> availableSites = new List<Site>();
+            DateTime today = DateTime.Now;
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("SELECT * FROM site " +
+                    "WHERE site.site_id " +
+                    "NOT IN(SELECT s.site_id FROM site s " +
+                    "JOIN campground c ON s.campground_id = c.campground_id " +
+                    "JOIN reservation r ON s.site_id = r.site_id WHERE park_id = @park_id AND @today " +
+                    "BETWEEN from_date AND to_date GROUP BY s.site_id);", conn);
+
+                cmd.Parameters.AddWithValue("@park_id", parkId);
+                cmd.Parameters.AddWithValue("@today", today);
+
+
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    Site site = GetSiteFromReader(reader);
+                    availableSites.Add(site);
+
+                }
+
+            }
+
+            return availableSites;
+
+        }
 
         private Site GetSiteFromReader(SqlDataReader reader)
         {

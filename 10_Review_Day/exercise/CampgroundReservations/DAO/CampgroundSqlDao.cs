@@ -21,7 +21,8 @@ namespace CampgroundReservations.DAO
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
-                SqlCommand cmd = new SqlCommand("SELECT campground_id, name, open_from_mm, open_to_mm, daily_fee FROM campground WHERE park_id = @park_id;", conn);
+                SqlCommand cmd = new SqlCommand("SELECT * " +
+                    "FROM campground WHERE park_id = @park_id;", conn);
                 cmd.Parameters.AddWithValue("@park_id", parkId);
 
                 SqlDataReader reader = cmd.ExecuteReader();
