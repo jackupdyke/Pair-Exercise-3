@@ -16,7 +16,22 @@ namespace CampgroundReservations.DAO
 
         public int CreateReservation(int siteId, string name, DateTime fromDate, DateTime toDate)
         {
-            throw new NotImplementedException();
+            int reservationId;
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("INSERT INTO reservation (site_id, name, from_date, to_date) " +
+                    "OUTPUT INSERTED.reservation_id " +
+                    "VALUES (@site_id, @name, @from_date, @to_date);", conn);
+                cmd.Parameters.AddWithValue("@site_id", siteId);
+                cmd.Parameters.AddWithValue("@name", name);
+                cmd.Parameters.AddWithValue("@from_date", fromDate);
+                cmd.Parameters.AddWithValue("@to_date", toDate);
+
+                reservationId = Convert.ToInt32(cmd.ExecuteScalar());
+            }
+            return reservationId;
         }
 
         private Reservation GetReservationFromReader(SqlDataReader reader)
