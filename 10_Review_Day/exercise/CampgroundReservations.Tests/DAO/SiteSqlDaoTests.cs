@@ -31,5 +31,15 @@ namespace CampgroundReservations.Tests.DAO
 
             Assert.AreEqual(2, sites.Count);
         }
+
+        [TestMethod]
+        public void FutureAvailableSiteTest()
+        {
+            SiteSqlDao dao = new SiteSqlDao(ConnectionString);
+
+            List<Site> sites = dao.FutureAvailableSites(ParkId, DateTime.Now.AddDays(1), DateTime.Now.AddDays(5));
+
+            Assert.AreEqual(2, sites.Count);
+        }
     }
 }

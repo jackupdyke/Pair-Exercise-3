@@ -71,6 +71,44 @@ namespace CampgroundReservations.DAO
 
         }
 
+        public List<Site> FutureAvailableSites(int parkId, DateTime start, DateTime end)
+        {
+
+            List<Site> futureAvailableSites = new List<Site>();
+           
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("SELECT * FROM site s WHERE s.site_id " +
+                    "NOT IN(SELECT s.site_id FROM site s  " +
+                    "JOIN campground c ON s.campground_id = c.campground_id  " +
+                    "JOIN reservation r ON s.site_id = r.site_id " +
+                    "WHERE park_id = @park_id AND ( (@start <= r.from_date AND @end >= r.to_date) " +
+                    "OR (@start >= r.from_date AND @end <= r.to_date) " +
+                    "OR (@start <= r.from_date AND  r.from_date <= @end) " +
+                    "OR (@start <= r.to_date AND r.to_date <= @end)) GROUP BY s.site_id);", conn);
+
+                cmd.Parameters.AddWithValue("@park_id", parkId);
+                cmd.Parameters.AddWithValue("@start", start);
+                cmd.Parameters.AddWithValue("@end", end);
+
+
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    Site site = GetSiteFromReader(reader);
+                    futureAvailableSites.Add(site);
+
+                }
+
+            }
+
+            return futureAvailableSites;
+
+        }
+
         private Site GetSiteFromReader(SqlDataReader reader)
         {
             Site site = new Site();
